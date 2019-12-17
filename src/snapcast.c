@@ -2,6 +2,7 @@
 
 #include <cjson/cJSON.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static cJSON* hello_message_to_json(hello_message_t *msg) {
     cJSON *mac;
@@ -98,7 +99,7 @@ char* hello_message_serialize(hello_message_t* msg) {
     return str;
 }
 
-int server_settings_message_parse(const char *json_str, server_settings_message_t *msg) {
+int server_settings_message_parse(server_settings_message_t *msg, const char *json_str) {
     int status = 1;
     cJSON *value = NULL;
     cJSON *json = cJSON_Parse(json_str);
@@ -137,4 +138,53 @@ int server_settings_message_parse(const char *json_str, server_settings_message_
 end:
     cJSON_Delete(json);
     return status;
+}
+
+static uint32_t read_uint32(char *data) {
+    uint32_t result = data[0];
+    result |= ((uint32_t)data[1]) << 8;
+    result |= ((uint32_t)data[2]) << 16;
+    result |= ((uint32_t)data[3]) << 24;
+    return result;
+}
+
+static int32_t read_int32(char *data) {
+    int32_t result = data[0];
+    result |= ((int32_t)data[1]) << 8;
+    result |= ((int32_t)data[2]) << 16;
+    result |= ((int32_t)data[3]) << 24;
+    return result;
+}
+
+int wire_chunk_message_parse(wire_chunk_message_t *msg, const char *data, uint32_t size) {
+    // If buffer is smaller than minimum size
+    if (size < 12) {
+        return 1;
+    }
+
+    msg->timestamp.sec = read_int32(data);
+    msg->timestamp.usec = read_int32(&(data[4]));
+    msg->size = read_uint32(&(data[8]));
+
+    // Total size of the message doesn't match with payload
+    if (size - 12 != msg->size) {
+        return 2;
+    }
+
+    // TODO maybe should check to see if need to free memory?
+    msg->payload = malloc(msg->size * sizeof(char));
+    // Failed to allocate the memory
+    if (!msg->payload) {
+        return 3;
+    }
+
+    memcpy(msg->payload, &(data[12]), msg->size);
+    return 0;
+}
+
+void wire_chunk_message_free(wire_chunk_message_t *msg) {
+    if (msg->payload) {
+        free(msg->payload);
+        msg->payload = NULL;
+    }
 }

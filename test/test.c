@@ -42,7 +42,7 @@ const char* server_settings_message_json_string = "{\"bufferMs\":1000,\"latency\
 int test_server_settings_message_parse() {
     server_settings_message_t ss_msg;
     int result = server_settings_message_parse(
-        server_settings_message_json_string, &ss_msg
+        &ss_msg, server_settings_message_json_string
     );
 
     if (result) {

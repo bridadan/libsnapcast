@@ -2,6 +2,7 @@
 #define __SNAPCAST_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 
 enum message_type {
     base = 0,
@@ -56,6 +57,14 @@ typedef struct hello_message {
     int protocol_version;
 } hello_message_t;
 
-char* hello_message_serialize(hello_message_t* msg);
+char* hello_message_serialize(hello_message_t *msg);
 
+typedef struct server_settings_message {
+    int32_t buffer_ms;
+    int32_t latency;
+    uint32_t volume;
+    bool muted;
+} server_settings_message_t;
+
+int server_settings_message_parse(const char *json, server_settings_message_t *msg);
 #endif // __SNAPCAST_H__

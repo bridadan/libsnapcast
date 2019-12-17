@@ -1,5 +1,7 @@
 #include "snapcast.h"
+
 #include <cjson/cJSON.h>
+#include <stdio.h>
 
 static cJSON* hello_message_to_json(hello_message_t *msg) {
     cJSON *mac;
@@ -94,4 +96,45 @@ char* hello_message_serialize(hello_message_t* msg) {
     cJSON_Delete(json);
 
     return str;
+}
+
+int server_settings_message_parse(const char *json_str, server_settings_message_t *msg) {
+    int status = 1;
+    cJSON *value = NULL;
+    cJSON *json = cJSON_Parse(json_str);
+    if (!json) {
+        const char *error_ptr = cJSON_GetErrorPtr();
+        if (error_ptr) {
+            // TODO change to a macro that can be diabled
+            fprintf(stderr, "Error before: %s\n", error_ptr);
+            goto end;
+        }
+    }
+
+    if (msg == NULL) {
+        status = 2;
+        goto end;
+    }
+
+    value = cJSON_GetObjectItemCaseSensitive(json, "bufferMs");
+    if (cJSON_IsNumber(value)) {
+        msg->buffer_ms = value->valueint;
+    }
+
+    value = cJSON_GetObjectItemCaseSensitive(json, "latency");
+    if (cJSON_IsNumber(value)) {
+        msg->latency = value->valueint;
+    }
+
+    value = cJSON_GetObjectItemCaseSensitive(json, "volume");
+    if (cJSON_IsNumber(value)) {
+        msg->volume = value->valueint;
+    }
+
+    value = cJSON_GetObjectItemCaseSensitive(json, "muted");
+    msg->muted = cJSON_IsTrue(value);
+    status = 0;
+end:
+    cJSON_Delete(json);
+    return status;
 }

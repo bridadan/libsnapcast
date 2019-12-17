@@ -5,6 +5,46 @@
 #include <stdlib.h>
 #include <string.h>
 
+static uint16_t read_uint16(const char *data) {
+    uint16_t result = data[0];
+    result |= ((uint16_t)data[1]) << 8;
+    return result;
+}
+
+static uint32_t read_uint32(const char *data) {
+    uint32_t result = data[0];
+    result |= ((uint32_t)data[1]) << 8;
+    result |= ((uint32_t)data[2]) << 16;
+    result |= ((uint32_t)data[3]) << 24;
+    return result;
+}
+
+static int32_t read_int32(const char *data) {
+    int32_t result = data[0];
+    result |= ((int32_t)data[1]) << 8;
+    result |= ((int32_t)data[2]) << 16;
+    result |= ((int32_t)data[3]) << 24;
+    return result;
+}
+
+int base_message_deserialize(base_message_t *msg, const char *data, uint32_t size) {
+    // Error if given bufer size isn't large enough for a base message
+    if (size < 26) {
+        return 1;
+    }
+
+    msg->type = read_uint16(data);
+    msg->id = read_uint16(&(data[2]));
+    msg->refersTo = read_uint16(&(data[4]));
+    msg->received.sec = read_int32(&(data[6]));
+    msg->received.usec = read_int32(&(data[10]));
+    msg->sent.sec = read_int32(&(data[14]));
+    msg->sent.usec = read_int32(&(data[18]));
+    msg->size = read_uint32(&(data[22]));
+
+    return 0;
+}
+
 static cJSON* hello_message_to_json(hello_message_t *msg) {
     cJSON *mac;
     cJSON *hostname;
@@ -139,22 +179,6 @@ int server_settings_message_deserialize(server_settings_message_t *msg, const ch
 end:
     cJSON_Delete(json);
     return status;
-}
-
-static uint32_t read_uint32(const char *data) {
-    uint32_t result = data[0];
-    result |= ((uint32_t)data[1]) << 8;
-    result |= ((uint32_t)data[2]) << 16;
-    result |= ((uint32_t)data[3]) << 24;
-    return result;
-}
-
-static int32_t read_int32(const char *data) {
-    int32_t result = data[0];
-    result |= ((int32_t)data[1]) << 8;
-    result |= ((int32_t)data[2]) << 16;
-    result |= ((int32_t)data[3]) << 24;
-    return result;
 }
 
 int wire_chunk_message_deserialize(wire_chunk_message_t *msg, const char *data, uint32_t size) {

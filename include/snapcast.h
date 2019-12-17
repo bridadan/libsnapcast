@@ -31,6 +31,8 @@ typedef struct base_message {
     uint32_t size;
 } base_message_t;
 
+int base_message_deserialize(base_message_t *msg, const char *data, uint32_t size);
+
 /* Sample Hello message
 {
     "Arch": "x86_64",

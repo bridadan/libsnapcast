@@ -66,7 +66,7 @@ typedef struct server_settings_message {
     bool muted;
 } server_settings_message_t;
 
-int server_settings_message_parse(server_settings_message_t *msg, const char *json_str);
+int server_settings_message_deserialize(server_settings_message_t *msg, const char *json_str);
 
 typedef struct wire_chunk_message {
     tv_t timestamp;
@@ -75,7 +75,9 @@ typedef struct wire_chunk_message {
 } wire_chunk_message_t;
 
 // TODO currently copies, could be made to not copy probably
-int wire_chunk_message_parse(wire_chunk_message_t *msg, const char *data, uint32_t size);
+int wire_chunk_message_deserialize(wire_chunk_message_t *msg, const char *data, uint32_t size);
 void wire_chunk_message_free(wire_chunk_message_t *msg);
+
+
 
 #endif // __SNAPCAST_H__

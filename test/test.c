@@ -39,14 +39,14 @@ int test_hello_message_serialize() {
 
 const char* server_settings_message_json_string = "{\"bufferMs\":1000,\"latency\":20,\"muted\":false,\"volume\":100}";
 
-int test_server_settings_message_parse() {
+int test_server_settings_message_deserialize() {
     server_settings_message_t ss_msg;
-    int result = server_settings_message_parse(
+    int result = server_settings_message_deserialize(
         &ss_msg, server_settings_message_json_string
     );
 
     if (result) {
-        printf("Failed to parse server settings message: code %d\r\n", result);
+        printf("Failed to deserialize server settings message: code %d\r\n", result);
         return 1;
     }
 
@@ -77,7 +77,7 @@ int main() {
     int fail = 0;
 
     fail |= test_hello_message_serialize();
-    fail |= test_server_settings_message_parse();
+    fail |= test_server_settings_message_deserialize();
 
     if (fail) {
         printf("Some tests failed\r\n");

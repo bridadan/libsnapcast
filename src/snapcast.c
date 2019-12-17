@@ -3,6 +3,7 @@
 #include <cjson/cJSON.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static cJSON* hello_message_to_json(hello_message_t *msg) {
     cJSON *mac;
@@ -99,7 +100,7 @@ char* hello_message_serialize(hello_message_t* msg) {
     return str;
 }
 
-int server_settings_message_parse(server_settings_message_t *msg, const char *json_str) {
+int server_settings_message_deserialize(server_settings_message_t *msg, const char *json_str) {
     int status = 1;
     cJSON *value = NULL;
     cJSON *json = cJSON_Parse(json_str);
@@ -140,7 +141,7 @@ end:
     return status;
 }
 
-static uint32_t read_uint32(char *data) {
+static uint32_t read_uint32(const char *data) {
     uint32_t result = data[0];
     result |= ((uint32_t)data[1]) << 8;
     result |= ((uint32_t)data[2]) << 16;
@@ -148,7 +149,7 @@ static uint32_t read_uint32(char *data) {
     return result;
 }
 
-static int32_t read_int32(char *data) {
+static int32_t read_int32(const char *data) {
     int32_t result = data[0];
     result |= ((int32_t)data[1]) << 8;
     result |= ((int32_t)data[2]) << 16;
@@ -156,7 +157,7 @@ static int32_t read_int32(char *data) {
     return result;
 }
 
-int wire_chunk_message_parse(wire_chunk_message_t *msg, const char *data, uint32_t size) {
+int wire_chunk_message_deserialize(wire_chunk_message_t *msg, const char *data, uint32_t size) {
     // If buffer is smaller than minimum size
     if (size < 12) {
         return 1;

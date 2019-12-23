@@ -21,11 +21,11 @@ CFLAGS = -g
 $(LIBRARY_ARCHIVE): $(SNAPCAST_OBJ)
 	ar rcs $@ $^
 
-test_bin: $(TEST_OBJ) $(LIBRARY_ARCHIVE)
+test/test: $(TEST_OBJ) $(LIBRARY_ARCHIVE)
 	$(CC) -o $@ $(TEST_SRC) $(LDFLAGS) $(SNAPCAST_INCLUDE) $(CFLAGS)
 
-test: test_bin
-	./test_bin
+test: test/test
+	./test/test
 
 install: $(LIBRARY_ARCHIVE)
 	mkdir -p $(DEST_LIB_DIR) $(DEST_INC_DIR)

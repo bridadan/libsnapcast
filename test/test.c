@@ -5,6 +5,160 @@
 #include <stdlib.h>
 #include <string.h>
 
+const int BASE_MESSAGE_SIZE = 26;
+
+const uint8_t base_message_serialized[] = {
+    // type
+    0x05, 0x00,
+    // id
+    0x01, 0x00,
+    // refersTo
+    0x34, 0x12,
+    // received.sec
+    0xEF, 0xBE, 0xAD, 0xDE,
+    // received.usec
+    0x0D, 0xD0, 0x37, 0x13,
+    // sent.sec
+    0x78, 0x56, 0x34, 0x12,
+    // sent.usec
+    0x21, 0x43, 0x65, 0x87,
+    // size
+    0x33, 0x22, 0x11, 0x00,
+};
+
+base_message_t base_message_deserialized = {
+    hello,
+    0x1,
+    0x1234,
+    { 0xDEADBEEF, 0x1337D00D },
+    { 0x12345678, 0x87654321 },
+    0x00112233,
+};
+
+void print_buffer(const char* buffer, size_t size) {
+    int i;
+    for (i = 0; i < size; i++) {
+        printf("%02x", buffer[i] & 0xff);
+    }
+}
+
+int test_base_message_serialize() {
+    char base_message_buffer[BASE_MESSAGE_SIZE];
+
+    int result = base_message_serialize(
+        &base_message_deserialized,
+        base_message_buffer,
+        BASE_MESSAGE_SIZE
+    );
+
+    if (result) {
+        printf("Failed to serialized base message\r\n");
+        return 1;
+    }
+
+    result = memcmp(
+        base_message_buffer,
+        base_message_serialized,
+        BASE_MESSAGE_SIZE
+    );
+    
+    if (result) {
+        printf("Serialized base message did not match expected value\r\n");
+        printf("Expected: ");
+        print_buffer(base_message_serialized, BASE_MESSAGE_SIZE);
+        printf("\r\nActual:   ");
+        print_buffer(base_message_buffer, BASE_MESSAGE_SIZE);
+        printf("\r\n");
+        return 1;
+    }
+
+    return 0;
+}
+
+int test_base_message_deserialize() {
+    base_message_t base_message;
+
+    int result = base_message_deserialize(&base_message, base_message_serialized, BASE_MESSAGE_SIZE);
+    if (result) {
+        printf("Failed to deserialize base message\r\n");
+        return 1;
+    }
+    
+    if (base_message.type != base_message_deserialized.type) {
+        printf(
+            "Expected type to be %u, actually was %u\r\n",
+            base_message_deserialized.type,
+            base_message.type
+        );
+        result = 1;
+    }
+    
+    if (base_message.id != base_message_deserialized.id) {
+        printf(
+            "Expected id to be %u, actually was %u\r\n",
+            base_message_deserialized.id,
+            base_message.id
+        );
+        result = 1;
+    }
+    
+    if (base_message.refersTo != base_message_deserialized.refersTo) {
+        printf(
+            "Expected refersTo to be %u, actually was %u\r\n",
+            base_message_deserialized.refersTo,
+            base_message.refersTo
+        );
+        result = 1;
+    }
+    
+    if (base_message.received.sec != base_message_deserialized.received.sec) {
+        printf(
+            "Expected received.sec to be %d, actually was %d\r\n",
+            base_message_deserialized.received.sec,
+            base_message.received.sec
+        );
+        result = 1;
+    }
+    
+    if (base_message.received.usec != base_message_deserialized.received.usec) {
+        printf(
+            "Expected received.usec to be %d, actually was %d\r\n",
+            base_message_deserialized.received.usec,
+            base_message.received.usec
+        );
+        result = 1;
+    }
+    
+    if (base_message.sent.sec != base_message_deserialized.sent.sec) {
+        printf(
+            "Expected sent.sec to be %d, actually was %d\r\n",
+            base_message_deserialized.sent.sec,
+            base_message.sent.sec
+        );
+        result = 1;
+    }
+    
+    if (base_message.sent.usec != base_message_deserialized.sent.usec) {
+        printf(
+            "Expected sent.usec to be %d, actually was %d\r\n",
+            base_message_deserialized.sent.usec,
+            base_message.sent.usec
+        );
+        result = 1;
+    }
+    
+    if (base_message.size != base_message_deserialized.size) {
+        printf(
+            "Expected size to be %u, actually was %u\r\n",
+            base_message_deserialized.size,
+            base_message.size
+        );
+        result = 1;
+    }
+
+    return result;
+}
+
 const char* hello_message_str_expected = "{\"MAC\":\"mac\",\"HostName\":\"hostname\",\"Version\":\"version\",\"ClientName\":\"client_name\",\"OS\":\"os\",\"Arch\":\"arch\",\"Instance\":1,\"ID\":\"id\",\"SnapStreamProtocolVersion\":2}";
 
 int test_hello_message_serialize() {
@@ -35,6 +189,7 @@ int test_hello_message_serialize() {
     }
 
     free(hello_message_str);
+    return 0;
 }
 
 const char* server_settings_message_json_string = "{\"bufferMs\":1000,\"latency\":20,\"muted\":false,\"volume\":100}";
@@ -76,6 +231,8 @@ int test_server_settings_message_deserialize() {
 int main() {
     int fail = 0;
 
+    fail |= test_base_message_serialize();
+    fail |= test_base_message_deserialize();
     fail |= test_hello_message_serialize();
     fail |= test_server_settings_message_deserialize();
 

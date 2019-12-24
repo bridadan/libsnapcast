@@ -10,7 +10,6 @@ DEST_LIB_DIR= $(DEST_PREFIX)/lib
 DEST_INC_DIR= $(DEST_PREFIX)/include
 
 TEST_SRC = $(wildcard test/*.c)
-TEST_OBJ = $(TEST_SRC:.c=.o)
 
 LDFLAGS = -L . -l cjson -l snapcast -l buffer
 CFLAGS = -g
@@ -21,7 +20,7 @@ CFLAGS = -g
 $(LIBRARY_ARCHIVE): $(SNAPCAST_OBJ)
 	ar rcs $@ $^
 
-test/test: $(TEST_OBJ) $(LIBRARY_ARCHIVE)
+test/test: $(LIBRARY_ARCHIVE) $(TEST_SRC)
 	$(CC) -o $@ $(TEST_SRC) $(LDFLAGS) $(SNAPCAST_INCLUDE) $(CFLAGS)
 
 test: test/test
@@ -38,4 +37,4 @@ uninstall:
 
 .PHONY: clean
 clean:
-	rm -f $(SNAPCAST_OBJ) $(TEST_OBJ) $(LIBRARY_ARCHIVE)
+	rm -f $(SNAPCAST_OBJ) $(LIBRARY_ARCHIVE)

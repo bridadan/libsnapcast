@@ -82,6 +82,7 @@ typedef struct codec_header_message {
 } codec_header_message_t;
 
 int codec_header_message_deserialize(codec_header_message_t *msg, const char *data, uint32_t size);
+void codec_header_message_free(codec_header_message_t *msg);
 
 typedef struct wire_chunk_message {
     tv_t timestamp;

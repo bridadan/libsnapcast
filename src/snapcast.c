@@ -263,6 +263,13 @@ int wire_chunk_message_deserialize(wire_chunk_message_t *msg, const char *data, 
     return result;
 }
 
+void codec_header_message_free(codec_header_message_t *msg) {
+    free(msg->codec);
+    msg->codec = NULL;
+    free(msg->payload);
+    msg->payload = NULL;
+}
+
 void wire_chunk_message_free(wire_chunk_message_t *msg) {
     if (msg->payload) {
         free(msg->payload);

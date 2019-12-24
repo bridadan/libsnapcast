@@ -162,6 +162,7 @@ const char* hello_message_str_json = "{\"MAC\":\"mac\",\"HostName\":\"hostname\"
 int test_hello_message_serialize() {
     hello_message_t hello;
 	size_t hello_message_json_size, hello_message_size, expected_size;
+    int result = 0;
 	char *hello_message_expected = NULL;
 
 	hello_message_json_size = strlen(hello_message_str_json);
@@ -203,12 +204,12 @@ int test_hello_message_serialize() {
         printf("Incorrect hello message serialization.\r\n");
         printf("Expected: %s\r\n", hello_message_expected);
         printf("Actual: %s\r\n", hello_message_str);
-        free(hello_message_str);
-        return 1;
+        result = 1;
     }
 
     free(hello_message_str);
-    return 0;
+    free(hello_message_expected);
+    return result;
 }
 
 const uint8_t codec_header_serialized[] = {
@@ -249,6 +250,8 @@ int test_codec_header_message_deserialize() {
         printf("\r\n");
         result = 1;
     }
+
+    codec_header_message_free(&codec_header_message);
 
     return result;
 }

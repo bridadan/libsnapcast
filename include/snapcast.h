@@ -75,6 +75,14 @@ typedef struct server_settings_message {
 
 int server_settings_message_deserialize(server_settings_message_t *msg, const char *json_str);
 
+typedef struct codec_header_message {
+   char *codec;
+   uint32_t size;
+   char *payload;
+} codec_header_message_t;
+
+int codec_header_message_deserialize(codec_header_message_t *msg, const char *data, uint32_t size);
+
 typedef struct wire_chunk_message {
     tv_t timestamp;
     uint32_t size;

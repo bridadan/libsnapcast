@@ -211,6 +211,48 @@ int test_hello_message_serialize() {
     return 0;
 }
 
+const uint8_t codec_header_serialized[] = {
+    // codec length
+    0x05, 0x00, 0x00, 0x00,
+    // codec
+    'c', 'o', 'd', 'e', 'c',
+    // size
+    0x04, 0x00, 0x00, 0x00,
+    // payload
+    0xEF, 0XBE, 0xAD, 0xDE,
+};
+
+int test_codec_header_message_deserialize() {
+    codec_header_message_t codec_header_message;
+    int result = codec_header_message_deserialize(&codec_header_message, codec_header_serialized, 17);
+    if (result) {
+        printf("Failed to deserialize codec header message: code %d\r\n", result);
+        return 1;
+    }
+    
+    if (strcmp(codec_header_message.codec, "codec")) {
+        printf("Expected codec to be \"codec\", actually was \"%s\"\r\n", codec_header_message.codec);
+        result = 1;
+    }
+
+    if (codec_header_message.size != 4) {
+        printf("Expected size to be %d, actually was %d\r\n", 4, codec_header_message.size);
+        result = 1;
+    }
+    
+    if (memcmp(codec_header_message.payload, &(codec_header_serialized[13]), 4)) {
+        printf("Payload did not match expected value\r\n");
+        printf("Expected: ");
+        print_buffer(&(codec_header_serialized[13]), 4);
+        printf("\r\nActual:   ");
+        print_buffer(codec_header_message.payload, 4);
+        printf("\r\n");
+        result = 1;
+    }
+
+    return result;
+}
+
 const char* server_settings_message_json_string = "{\"bufferMs\":1000,\"latency\":20,\"muted\":false,\"volume\":100}";
 
 int test_server_settings_message_deserialize() {
@@ -253,6 +295,7 @@ int main() {
     fail |= test_base_message_serialize();
     fail |= test_base_message_deserialize();
     fail |= test_hello_message_serialize();
+    fail |= test_codec_header_message_deserialize();
     fail |= test_server_settings_message_deserialize();
 
     if (fail) {

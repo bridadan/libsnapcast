@@ -200,6 +200,43 @@ end:
     return status;
 }
 
+int codec_header_message_deserialize(codec_header_message_t *msg, const char *data, uint32_t size) {
+    read_buffer_t buffer;
+    uint32_t string_size;
+    int result = 0;
+
+    buffer_read_init(&buffer, data, size);
+
+    result |=  buffer_read_uint32(&buffer, &string_size);
+    if (result) {
+        // Can't allocate the proper size string if we didn't read the size, so fail early
+        return 1;
+    }
+
+    msg->codec = malloc(string_size + 1);
+    if (!msg->codec) {
+        return 2;
+    }
+    
+    result |= buffer_read_buffer(&buffer, msg->codec, string_size);
+    // Make sure the codec is a proper C string by terminating it with a null character
+    msg->codec[string_size] = '\0';
+    
+    result |=  buffer_read_uint32(&buffer, &(msg->size));
+    if (result) {
+        // Can't allocate the proper size string if we didn't read the size, so fail early
+        return 1;
+    }
+    
+    msg->payload = malloc(msg->size);
+    if (!msg->payload) {
+        return 2;
+    }
+
+    result |= buffer_read_buffer(&buffer, msg->payload, msg->size);
+    return result;
+}
+
 int wire_chunk_message_deserialize(wire_chunk_message_t *msg, const char *data, uint32_t size) {
     read_buffer_t buffer;
     int result = 0;

@@ -6,6 +6,8 @@
 #include <string.h>
 #include "buffer.h"
 
+const int BASE_MESSAGE_SIZE = 26;
+
 int base_message_serialize(base_message_t *msg, char *data, uint32_t size) {
     write_buffer_t buffer;
     int result = 0;

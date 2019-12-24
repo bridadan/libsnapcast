@@ -35,6 +35,11 @@ uninstall:
 	rm -f $(addprefix $(DEST_LIB_DIR)/,$(LIBRARY_ARCHIVE))
 	rm -f $(addprefix $(DEST_INC_DIR)/,$(INC_HEADER))
 
+examples/minimal_client/minimal_client: $(LIBRARY_ARCHIVE) examples/minimal_client/main.c
+	$(CC) -o $@ examples/minimal_client/main.c $(LDFLAGS) $(SNAPCAST_INCLUDE) $(CFLAGS)
+
+examples: examples/minimal_client/minimal_client
+
 .PHONY: clean
 clean:
-	rm -f $(SNAPCAST_OBJ) $(LIBRARY_ARCHIVE)
+	rm -f $(SNAPCAST_OBJ) $(LIBRARY_ARCHIVE) examples/minimal_client/minimal_client

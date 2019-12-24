@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-const int BASE_MESSAGE_SIZE = 26;
-
 const uint8_t base_message_serialized[] = {
     // type
     0x05, 0x00,

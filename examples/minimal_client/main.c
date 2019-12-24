@@ -19,7 +19,6 @@ void func(int sockfd)
 	char base_message_serialized[BASE_MESSAGE_SIZE];
 	char size_buffer[4];
 	char *hello_message_serialized;
-	size_t hello_message_size;
 	int result, i;
 	
 	base_message_t base_message = {
@@ -43,19 +42,11 @@ void func(int sockfd)
 		2,
 	};
 
-	hello_message_serialized = hello_message_serialize(&hello_message);
+	hello_message_serialized = hello_message_serialize(&hello_message, (size_t*) &(base_message.size));
 	if (!hello_message_serialized) {
 		printf("Failed to serialize hello message\r\b");
 		return;
 	}
-
-	hello_message_size = strlen(hello_message_serialized);
-	base_message.size = hello_message_size + sizeof(uint32_t);
-
-	size_buffer[0] = hello_message_size & 0xff;
-	size_buffer[1] = (hello_message_size >> 8) & 0xff;
-	size_buffer[2] = (hello_message_size >> 16) & 0xff;
-	size_buffer[3] = (hello_message_size >> 24) & 0xff;
 
 	result = base_message_serialize(
 		&base_message,
@@ -67,10 +58,7 @@ void func(int sockfd)
 		return;
 	}
 
-
-
 	write(sockfd, base_message_serialized, BASE_MESSAGE_SIZE);
-	write(sockfd, size_buffer, 4); 
 	write(sockfd, hello_message_serialized, base_message.size);
 	result = read(sockfd, buff, MAX);
 	if (result < 0) {

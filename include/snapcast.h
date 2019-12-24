@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 enum message_type {
     base = 0,
@@ -63,7 +64,7 @@ typedef struct hello_message {
     int protocol_version;
 } hello_message_t;
 
-char* hello_message_serialize(hello_message_t *msg);
+char* hello_message_serialize(hello_message_t* msg, size_t *size);
 
 typedef struct server_settings_message {
     int32_t buffer_ms;

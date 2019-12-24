@@ -157,10 +157,26 @@ int test_base_message_deserialize() {
     return result;
 }
 
-const char* hello_message_str_expected = "{\"MAC\":\"mac\",\"HostName\":\"hostname\",\"Version\":\"version\",\"ClientName\":\"client_name\",\"OS\":\"os\",\"Arch\":\"arch\",\"Instance\":1,\"ID\":\"id\",\"SnapStreamProtocolVersion\":2}";
+const char* hello_message_str_json = "{\"MAC\":\"mac\",\"HostName\":\"hostname\",\"Version\":\"version\",\"ClientName\":\"client_name\",\"OS\":\"os\",\"Arch\":\"arch\",\"Instance\":1,\"ID\":\"id\",\"SnapStreamProtocolVersion\":2}";
 
 int test_hello_message_serialize() {
     hello_message_t hello;
+	size_t hello_message_json_size, hello_message_size, expected_size;
+	char *hello_message_expected = NULL;
+
+	hello_message_json_size = strlen(hello_message_str_json);
+	expected_size = hello_message_json_size + 4;
+	hello_message_expected = malloc(expected_size);
+
+	hello_message_expected[0] = hello_message_json_size & 0xff;
+	hello_message_expected[1] = (hello_message_json_size >> 8) & 0xff;
+	hello_message_expected[2] = (hello_message_json_size >> 16) & 0xff;
+	hello_message_expected[3] = (hello_message_json_size >> 24) & 0xff;
+	memcpy(
+		&(hello_message_expected[4]),
+		hello_message_str_json,
+		hello_message_json_size
+	);
 
     hello.mac = "mac";
     hello.hostname = "hostname";
@@ -172,15 +188,20 @@ int test_hello_message_serialize() {
     hello.id = "id";
     hello.protocol_version = 2;
 
-    char *hello_message_str = hello_message_serialize(&hello);
+    char *hello_message_str = hello_message_serialize(&hello, &hello_message_size);
     if (!hello_message_str) {
         printf("Failed to serialize hello message\r\n");
         return 1;
     }
+    
+	if (hello_message_size != expected_size) {
+        printf("Expected size to be %d, actually was %d\r\n", expected_size, hello_message_size);
+        return 1;
+    }
 
-    if (strcmp(hello_message_str, hello_message_str_expected)) {
+    if (memcmp(hello_message_str, hello_message_expected, hello_message_size)) {
         printf("Incorrect hello message serialization.\r\n");
-        printf("Expected: %s\r\n", hello_message_str_expected);
+        printf("Expected: %s\r\n", hello_message_expected);
         printf("Actual: %s\r\n", hello_message_str);
         free(hello_message_str);
         return 1;

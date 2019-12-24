@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 #include "buffer.h"
 
 const int BASE_MESSAGE_SIZE = 26;
@@ -123,10 +124,11 @@ end:
     return json;
 }
 
-char* hello_message_serialize(hello_message_t* msg) {
-    int result;
+char* hello_message_serialize(hello_message_t* msg, size_t *size) {
+    int str_length, prefixed_length;
     cJSON *json;
     char *str = NULL;
+	char *prefixed_str = NULL;
 
     json = hello_message_to_json(msg);
     if (!json) {
@@ -134,9 +136,27 @@ char* hello_message_serialize(hello_message_t* msg) {
     }
 
     str = cJSON_PrintUnformatted(json);
+	if (!str) {
+		return NULL;
+	}
     cJSON_Delete(json);
 
-    return str;
+	str_length = strlen(str);
+	prefixed_length = str_length + 4;
+	prefixed_str = malloc(prefixed_length);
+	if (!prefixed_str) {
+		return NULL;
+	}
+
+	prefixed_str[0] = str_length & 0xff;
+	prefixed_str[1] = (str_length >> 8) & 0xff;
+	prefixed_str[2] = (str_length >> 16) & 0xff;
+	prefixed_str[3] = (str_length >> 24) & 0xff;
+	memcpy(&(prefixed_str[4]), str, str_length);
+	free(str);
+	*size = prefixed_length;
+
+    return prefixed_str;
 }
 
 int server_settings_message_deserialize(server_settings_message_t *msg, const char *json_str) {

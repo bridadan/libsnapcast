@@ -10,7 +10,7 @@ enum message_type {
     codec_header = 1,
     wire_chunk = 2,
     server_settings = 3,
-    time = 4,
+    time_sync = 4,
     hello = 5,
     stream_tags = 6,
 

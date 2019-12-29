@@ -1,11 +1,11 @@
 #include "snapcast.h"
 
-#include <cjson/cJSON.h>
+#include <cJSON.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "buffer.h"
+#include <buffer.h>
 
 const int BASE_MESSAGE_SIZE = 26;
 

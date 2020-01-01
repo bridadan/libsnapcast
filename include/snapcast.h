@@ -6,16 +6,16 @@
 #include <stddef.h>
 
 enum message_type {
-    base = 0,
-    codec_header = 1,
-    wire_chunk = 2,
-    server_settings = 3,
-    time_sync = 4,
-    hello = 5,
-    stream_tags = 6,
+    SNAPCAST_MESSAGE_BASE = 0,
+    SNAPCAST_MESSAGE_CODEC_HEADER = 1,
+    SNAPCAST_MESSAGE_WIRE_CHUNK = 2,
+    SNAPCAST_MESSAGE_SERVER_SETTINGS = 3,
+    SNAPCAST_MESSAGE_TIME = 4,
+    SNAPCAST_MESSAGE_HELLO = 5,
+    SNAPCAST_MESSAGE_STREAM_TAGS = 6,
 
-    first = base,
-    last = stream_tags
+    SNAPCAST_MESSAGE_FIRST = SNAPCAST_MESSAGE_BASE,
+    SNAPCAST_MESSAGE_LAST = SNAPCAST_MESSAGE_STREAM_TAGS
 };
 
 typedef struct tv {

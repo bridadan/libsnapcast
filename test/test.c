@@ -25,7 +25,7 @@ const uint8_t base_message_serialized[] = {
 };
 
 base_message_t base_message_deserialized = {
-    hello,
+    SNAPCAST_MESSAGE_HELLO,
     0x1,
     0x1234,
     { 0xDEADBEEF, 0x1337D00D },
@@ -59,7 +59,7 @@ int test_base_message_serialize() {
         base_message_serialized,
         BASE_MESSAGE_SIZE
     );
-    
+
     if (result) {
         printf("Serialized base message did not match expected value\r\n");
         printf("Expected: ");
@@ -81,7 +81,7 @@ int test_base_message_deserialize() {
         printf("Failed to deserialize base message\r\n");
         return 1;
     }
-    
+
     if (base_message.type != base_message_deserialized.type) {
         printf(
             "Expected type to be %u, actually was %u\r\n",
@@ -90,7 +90,7 @@ int test_base_message_deserialize() {
         );
         result = 1;
     }
-    
+
     if (base_message.id != base_message_deserialized.id) {
         printf(
             "Expected id to be %u, actually was %u\r\n",
@@ -99,7 +99,7 @@ int test_base_message_deserialize() {
         );
         result = 1;
     }
-    
+
     if (base_message.refersTo != base_message_deserialized.refersTo) {
         printf(
             "Expected refersTo to be %u, actually was %u\r\n",
@@ -108,7 +108,7 @@ int test_base_message_deserialize() {
         );
         result = 1;
     }
-    
+
     if (base_message.received.sec != base_message_deserialized.received.sec) {
         printf(
             "Expected received.sec to be %d, actually was %d\r\n",
@@ -117,7 +117,7 @@ int test_base_message_deserialize() {
         );
         result = 1;
     }
-    
+
     if (base_message.received.usec != base_message_deserialized.received.usec) {
         printf(
             "Expected received.usec to be %d, actually was %d\r\n",
@@ -126,7 +126,7 @@ int test_base_message_deserialize() {
         );
         result = 1;
     }
-    
+
     if (base_message.sent.sec != base_message_deserialized.sent.sec) {
         printf(
             "Expected sent.sec to be %d, actually was %d\r\n",
@@ -135,7 +135,7 @@ int test_base_message_deserialize() {
         );
         result = 1;
     }
-    
+
     if (base_message.sent.usec != base_message_deserialized.sent.usec) {
         printf(
             "Expected sent.usec to be %d, actually was %d\r\n",
@@ -144,7 +144,7 @@ int test_base_message_deserialize() {
         );
         result = 1;
     }
-    
+
     if (base_message.size != base_message_deserialized.size) {
         printf(
             "Expected size to be %u, actually was %u\r\n",
@@ -194,7 +194,7 @@ int test_hello_message_serialize() {
         printf("Failed to serialize hello message\r\n");
         return 1;
     }
-    
+
 	if (hello_message_size != expected_size) {
         printf("Expected size to be %d, actually was %d\r\n", expected_size, hello_message_size);
         return 1;
@@ -230,7 +230,7 @@ int test_codec_header_message_deserialize() {
         printf("Failed to deserialize codec header message: code %d\r\n", result);
         return 1;
     }
-    
+
     if (strcmp(codec_header_message.codec, "codec")) {
         printf("Expected codec to be \"codec\", actually was \"%s\"\r\n", codec_header_message.codec);
         result = 1;
@@ -240,7 +240,7 @@ int test_codec_header_message_deserialize() {
         printf("Expected size to be %d, actually was %d\r\n", 4, codec_header_message.size);
         result = 1;
     }
-    
+
     if (memcmp(codec_header_message.payload, &(codec_header_serialized[13]), 4)) {
         printf("Payload did not match expected value\r\n");
         printf("Expected: ");

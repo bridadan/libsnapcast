@@ -1,6 +1,6 @@
 #include "snapcast.h"
 
-#include <cJSON.h>
+#include <cjson/cJSON.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -217,17 +217,17 @@ int codec_header_message_deserialize(codec_header_message_t *msg, const char *da
     if (!msg->codec) {
         return 2;
     }
-    
+
     result |= buffer_read_buffer(&buffer, msg->codec, string_size);
     // Make sure the codec is a proper C string by terminating it with a null character
     msg->codec[string_size] = '\0';
-    
+
     result |=  buffer_read_uint32(&buffer, &(msg->size));
     if (result) {
         // Can't allocate the proper size string if we didn't read the size, so fail early
         return 1;
     }
-    
+
     msg->payload = malloc(msg->size);
     if (!msg->payload) {
         return 2;

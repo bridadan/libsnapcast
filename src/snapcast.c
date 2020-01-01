@@ -15,14 +15,14 @@ int base_message_serialize(base_message_t *msg, char *data, uint32_t size) {
 
     buffer_write_init(&buffer, data, size);
 
-    result |=  buffer_write_uint16(&buffer, msg->type);
-    result |=  buffer_write_uint16(&buffer, msg->id);
-    result |=  buffer_write_uint16(&buffer, msg->refersTo);
-    result |=  buffer_write_int32(&buffer, msg->received.sec);
-    result |=  buffer_write_int32(&buffer, msg->received.usec);
-    result |=  buffer_write_int32(&buffer, msg->sent.sec);
-    result |=  buffer_write_int32(&buffer, msg->sent.usec);
-    result |=  buffer_write_uint32(&buffer, msg->size);
+    result |= buffer_write_uint16(&buffer, msg->type);
+    result |= buffer_write_uint16(&buffer, msg->id);
+    result |= buffer_write_uint16(&buffer, msg->refersTo);
+    result |= buffer_write_int32(&buffer, msg->received.sec);
+    result |= buffer_write_int32(&buffer, msg->received.usec);
+    result |= buffer_write_int32(&buffer, msg->sent.sec);
+    result |= buffer_write_int32(&buffer, msg->sent.usec);
+    result |= buffer_write_uint32(&buffer, msg->size);
 
     return result;
 }
@@ -33,14 +33,14 @@ int base_message_deserialize(base_message_t *msg, const char *data, uint32_t siz
 
     buffer_read_init(&buffer, data, size);
 
-    result |=  buffer_read_uint16(&buffer, &(msg->type));
-    result |=  buffer_read_uint16(&buffer, &(msg->id));
-    result |=  buffer_read_uint16(&buffer, &(msg->refersTo));
-    result |=  buffer_read_int32(&buffer, &(msg->received.sec));
-    result |=  buffer_read_int32(&buffer, &(msg->received.usec));
-    result |=  buffer_read_int32(&buffer, &(msg->sent.sec));
-    result |=  buffer_read_int32(&buffer, &(msg->sent.usec));
-    result |=  buffer_read_uint32(&buffer, &(msg->size));
+    result |= buffer_read_uint16(&buffer, &(msg->type));
+    result |= buffer_read_uint16(&buffer, &(msg->id));
+    result |= buffer_read_uint16(&buffer, &(msg->refersTo));
+    result |= buffer_read_int32(&buffer, &(msg->received.sec));
+    result |= buffer_read_int32(&buffer, &(msg->received.usec));
+    result |= buffer_read_int32(&buffer, &(msg->sent.sec));
+    result |= buffer_read_int32(&buffer, &(msg->sent.usec));
+    result |= buffer_read_uint32(&buffer, &(msg->size));
 
     return result;
 }
@@ -207,7 +207,7 @@ int codec_header_message_deserialize(codec_header_message_t *msg, const char *da
 
     buffer_read_init(&buffer, data, size);
 
-    result |=  buffer_read_uint32(&buffer, &string_size);
+    result |= buffer_read_uint32(&buffer, &string_size);
     if (result) {
         // Can't allocate the proper size string if we didn't read the size, so fail early
         return 1;
@@ -222,7 +222,7 @@ int codec_header_message_deserialize(codec_header_message_t *msg, const char *da
     // Make sure the codec is a proper C string by terminating it with a null character
     msg->codec[string_size] = '\0';
 
-    result |=  buffer_read_uint32(&buffer, &(msg->size));
+    result |= buffer_read_uint32(&buffer, &(msg->size));
     if (result) {
         // Can't allocate the proper size string if we didn't read the size, so fail early
         return 1;
@@ -243,9 +243,9 @@ int wire_chunk_message_deserialize(wire_chunk_message_t *msg, const char *data, 
 
     buffer_read_init(&buffer, data, size);
 
-    result |=  buffer_read_int32(&buffer, &(msg->timestamp.sec));
-    result |=  buffer_read_int32(&buffer, &(msg->timestamp.usec));
-    result |=  buffer_read_uint32(&buffer, &(msg->size));
+    result |= buffer_read_int32(&buffer, &(msg->timestamp.sec));
+    result |= buffer_read_int32(&buffer, &(msg->timestamp.usec));
+    result |= buffer_read_uint32(&buffer, &(msg->size));
 
     // If there's been an error already (especially for the size bit) return early
     if (result) {

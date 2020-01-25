@@ -50,7 +50,7 @@ int test_base_message_serialize() {
     );
 
     if (result) {
-        printf("Failed to serialized base message\r\n");
+        printf("Failed to serialize base message\r\n");
         return 1;
     }
 
@@ -292,6 +292,81 @@ int test_server_settings_message_deserialize() {
     return result;
 }
 
+const uint8_t time_message_serialized[] = {
+    // latency.sec
+    0x78, 0x56, 0x34, 0x12,
+    // latency.usec
+    0x21, 0x43, 0x65, 0x87,
+};
+
+time_message_t time_message_deserialized = {
+    { 0x12345678, 0x87654321 },
+};
+
+int test_time_message_serialize() {
+    const int TIME_MESSAGE_SIZE = 8;
+    char time_message_buffer[TIME_MESSAGE_SIZE];
+
+    int result = time_message_serialize(
+        &time_message_deserialized,
+        time_message_buffer,
+        TIME_MESSAGE_SIZE
+    );
+
+    if (result) {
+        printf("Failed to serialize time message\r\n");
+        return 1;
+    }
+
+    result = memcmp(
+        time_message_buffer,
+        time_message_serialized,
+        TIME_MESSAGE_SIZE
+    );
+
+    if (result) {
+        printf("Serialized time message did not match expected value\r\n");
+        printf("Expected: ");
+        print_buffer(time_message_serialized, TIME_MESSAGE_SIZE);
+        printf("\r\nActual:   ");
+        print_buffer(time_message_buffer, TIME_MESSAGE_SIZE);
+        printf("\r\n");
+        return 1;
+    }
+
+    return 0;
+}
+
+int test_time_message_deserialize() {
+    time_message_t time_message;
+
+    int result = time_message_deserialize(&time_message, time_message_serialized, BASE_MESSAGE_SIZE);
+    if (result) {
+        printf("Failed to deserialize time message\r\n");
+        return 1;
+    }
+
+    if (time_message.latency.sec != time_message_deserialized.latency.sec) {
+        printf(
+            "Expected latency.sec to be %d, actually was %d\r\n",
+            time_message_deserialized.latency.sec,
+            time_message.latency.sec
+        );
+        result = 1;
+    }
+
+    if (time_message.latency.usec != time_message_deserialized.latency.usec) {
+        printf(
+            "Expected latency.usec to be %d, actually was %d\r\n",
+            time_message_deserialized.latency.usec,
+            time_message.latency.usec
+        );
+        result = 1;
+    }
+
+    return result;
+}
+
 int main() {
     int fail = 0;
 
@@ -300,6 +375,8 @@ int main() {
     fail |= test_hello_message_serialize();
     fail |= test_codec_header_message_deserialize();
     fail |= test_server_settings_message_deserialize();
+    fail |= test_time_message_serialize();
+    fail |= test_time_message_deserialize();
 
     if (fail) {
         printf("Some tests failed\r\n");

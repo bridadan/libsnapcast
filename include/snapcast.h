@@ -94,6 +94,14 @@ typedef struct wire_chunk_message {
 int wire_chunk_message_deserialize(wire_chunk_message_t *msg, const char *data, uint32_t size);
 void wire_chunk_message_free(wire_chunk_message_t *msg);
 
+typedef struct time_message {
+    tv_t latency;
+} time_message_t;
+
+int time_message_serialize(time_message_t *msg, char *data, uint32_t size);
+int time_message_deserialize(time_message_t *msg, const char *data, uint32_t size);
+
+
 
 
 #endif // __SNAPCAST_H__

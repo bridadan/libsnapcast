@@ -27,12 +27,13 @@ typedef struct base_message {
     uint16_t type;
     uint16_t id;
     uint16_t refersTo;
-    tv_t received;
     tv_t sent;
+    tv_t received;
     uint32_t size;
 } base_message_t;
 
 extern const int BASE_MESSAGE_SIZE;
+extern const int TIME_MESSAGE_SIZE;
 
 int base_message_serialize(base_message_t *msg, char *data, uint32_t size);
 

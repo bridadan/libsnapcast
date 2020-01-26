@@ -304,7 +304,6 @@ time_message_t time_message_deserialized = {
 };
 
 int test_time_message_serialize() {
-    const int TIME_MESSAGE_SIZE = 8;
     char time_message_buffer[TIME_MESSAGE_SIZE];
 
     int result = time_message_serialize(
